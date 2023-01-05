@@ -1,8 +1,8 @@
-import logger from './logger'
+import type { Logger } from "pino"
 
 const MUTEX_TIMEOUT_MS = 60_000
 
-export const makeMutex = () => {
+export const makeMutex = (logger: Logger) => {
 	let task = Promise.resolve() as Promise<any>
 
 	let taskTimeout: NodeJS.Timeout | undefined
@@ -40,13 +40,13 @@ export const makeMutex = () => {
 
 export type Mutex = ReturnType<typeof makeMutex>
 
-export const makeKeyedMutex = () => {
+export const makeKeyedMutex = (logger: Logger) => {
 	const map: { [id: string]: Mutex } = {}
 
 	return {
 		mutex<T>(key: string, task: () => Promise<T> | T): Promise<T> {
 			if(!map[key]) {
-				map[key] = makeMutex()
+				map[key] = makeMutex(logger)
 			}
 
 			return map[key].mutex(task)

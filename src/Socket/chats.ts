@@ -34,7 +34,7 @@ export const makeChatsSocket = (config: SocketConfig) => {
 	let needToFlushWithAppStateSync = false
 	let pendingAppStateSync = false
 	/** this mutex ensures that the notifications (receipts, messages etc.) are processed in order */
-	const processingMutex = makeMutex()
+	const processingMutex = makeMutex(logger)
 
 	/** helper function to fetch the given app state sync key */
 	const getAppStateSyncKey = async(keyId: string) => {

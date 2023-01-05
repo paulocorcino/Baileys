@@ -1,6 +1,7 @@
 import EventEmitter from 'events'
 import { createReadStream } from 'fs'
 import { writeFile } from 'fs/promises'
+import type { Logger } from 'pino'
 import { createInterface } from 'readline'
 import type { BaileysEventEmitter } from '../Types'
 import { delay } from './generics'
@@ -11,10 +12,10 @@ import { makeMutex } from './make-mutex'
  * @param ev The event emitter to read events from
  * @param filename File to save to
  */
-export const captureEventStream = (ev: BaileysEventEmitter, filename: string) => {
+export const captureEventStream = (ev: BaileysEventEmitter, filename: string, logger: Logger) => {
 	const oldEmit = ev.emit
 	// write mutex so data is appended in order
-	const writeMutex = makeMutex()
+	const writeMutex = makeMutex(logger)
 	// monkey patch eventemitter to capture all events
 	ev.emit = function(...args: any[]) {
 		const content = JSON.stringify({ timestamp: Date.now(), event: args[0], data: args[1] }) + '\n'
